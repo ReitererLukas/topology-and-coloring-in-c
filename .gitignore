@@ -1,6 +1,6 @@
 build
 test
-test.c
+test.cpp
 topology
 testrunner
 seed*.txt
