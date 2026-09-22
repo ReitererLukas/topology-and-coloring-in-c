@@ -1,4 +1,5 @@
 CXX = g++
+CPPFLAGS = -Isrc
 CXXFLAGS = -Wall -Wextra -Wpedantic -Wshadow -Wconversion \
            -Woverloaded-virtual -Wnon-virtual-dtor -Wdelete-non-virtual-dtor \
            -Wformat=2 -Winit-self -Wunused-variable -Wunused-function \
@@ -9,13 +10,13 @@ BINDIR = .
 TESTDIR = tests
 TESTBIN = $(BINDIR)/testrunner
 
-SOURCES = $(wildcard $(SRCDIR)/*.cpp)
-OBJECTS = $(SOURCES:$(SRCDIR)/%.cpp=$(OBJDIR)/%.o)
+SOURCES = $(shell find $(SRCDIR) -type f -name '*.cpp' | sort)
+OBJECTS = $(patsubst $(SRCDIR)/%.cpp,$(OBJDIR)/%.o,$(SOURCES))
 TARGET = $(BINDIR)/topology
 
 # Test sources (exclude main.cpp from linking)
 TEST_SOURCES = $(filter-out $(SRCDIR)/main.cpp, $(SOURCES))
-TEST_OBJECTS = $(TEST_SOURCES:$(SRCDIR)/%.cpp=$(OBJDIR)/%.o)
+TEST_OBJECTS = $(patsubst $(SRCDIR)/%.cpp,$(OBJDIR)/%.o,$(TEST_SOURCES))
 TEST_OBJECTS += $(OBJDIR)/test_runner_main.o
 
 .PHONY: all clean run test
@@ -29,10 +30,11 @@ $(OBJDIR):
 	mkdir -p $(OBJDIR)
 
 $(OBJDIR)/%.o: $(SRCDIR)/%.cpp | $(OBJDIR)
-	$(CXX) $(CXXFLAGS) -c $< -o $@
+	@mkdir -p $(dir $@)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $< -o $@
 
 $(TARGET): $(OBJECTS)
-	$(CXX) $(CXXFLAGS) $(OBJECTS) -o $(TARGET)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(OBJECTS) -o $(TARGET)
 
 run: $(TARGET)
 	./$(TARGET) $(filter-out $@,$(MAKECMDGOALS))
@@ -41,10 +43,11 @@ test: $(TESTBIN)
 	./$(TESTBIN)
 
 $(TESTBIN): $(TEST_OBJECTS)
-	$(CXX) $(CXXFLAGS) $(TEST_OBJECTS) -o $(TESTBIN)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(TEST_OBJECTS) -o $(TESTBIN)
 
 $(OBJDIR)/test_runner_main.o: $(TESTDIR)/test_runner.cpp | $(OBJDIR)
-	$(CXX) $(CXXFLAGS) -c $< -o $@
+	@mkdir -p $(dir $@)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $< -o $@
 
 clean:
 	rm -rf $(OBJDIR) $(TARGET) $(TESTBIN)
