@@ -1,30 +1,36 @@
 #include "sat.h"
-#include <cassert>
 #include <iostream>
-#include <limits>
 
-void SAT::solve() {
-    assert(colors_ > 0);
-    assert(numberOfNodes_ * colors_ <= std::numeric_limits<int>::max() && "Due to limitations of the solver we can only support up to 2^31 - 1 variables in sat");
-
-    std::cout << "Creating SAT Node Clauses" << std::endl;
-    for(int i = 0; i < numberOfNodes_; i++) {
-        Node node = nodes_[i];
-        int id = node.getId(inputColors_);
-        
-        for(int color = 0; color < colors_; color++) {
-            solver_.add(id + (color * numberOfNodes_));
-        }
-        solver_.add(0);
-        
-        for(int c1 = 0; c1 < colors_; c1++) {
-            for(int c2 = c1+1; c2 < colors_; c2++) {
-                solver_.add(-(id + (c1 * numberOfNodes_)));
-                solver_.add(-(id + (c2 * numberOfNodes_)));
-                solver_.add(0);
-            }
+void SAT::addNode(Node* node) {
+    int id = node->getId(inputColors_);
+    
+    for(int color = 0; color < outputColors_; color++) {
+        solver_.add(id + (color * (int) numberOfNodes_));
+    }
+    solver_.add(0);
+    
+    for(int c1 = 0; c1 < outputColors_; c1++) {
+        for(int c2 = c1+1; c2 < outputColors_; c2++) {
+            solver_.add(-(id + (c1 * (int) numberOfNodes_)));
+            solver_.add(-(id + (c2 * (int) numberOfNodes_)));
+            solver_.add(0);
         }
     }
+}
 
-    std::cout << "Creating SAT Edge Clauses" << std::endl;
+void SAT::addEdge(Node& node1, std::set<Node>::iterator& node2) {
+    int id1 = node1.getId(inputColors_);
+    int id2 = node2->getId(inputColors_);
+    for(int color = 0; color < outputColors_; color++) {
+        solver_.add(-(id1 + ( color * (int) numberOfNodes_)));
+        solver_.add(-(id2 + ( color * (int) numberOfNodes_)));
+        solver_.add(0);
+    }
+}
+
+bool SAT::solve() {
+    int ret = solver_.solve();
+    std::cout << "SAT solver returned " << ret << std::endl;
+    return (ret == 10);
+
 }

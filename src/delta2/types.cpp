@@ -58,11 +58,11 @@ int Node::getId(int inputColors) const {
         return nearRank * side + outerRank;
     };
 
-    const std::uint64_t leftArm = armRank(left_, left_left_);
-    const std::uint64_t rightArm = armRank(right_, right_right_);
+    const int leftArm = armRank(left_, left_left_);
+    const int rightArm = armRank(right_, right_right_);
 
-    const std::uint64_t lower = std::min(leftArm, rightArm);
-    const std::uint64_t upper = std::max(leftArm, rightArm);
+    const int lower = std::min(leftArm, rightArm);
+    const int upper = std::max(leftArm, rightArm);
 
     // Perfect rank for an unordered pair with repetition.
     const int pairRank = upper * (upper + 1) / 2 + lower;

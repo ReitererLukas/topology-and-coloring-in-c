@@ -4,18 +4,17 @@
 #include <vector>
 #include "types.h"
 #include <set>
+#include "sat.h"
 
 class Delta2GraphCreator {
 private:
     int inputColors_;
     int outputColors_;
-    std::vector<int> aColors;
-    std::vector<int> bColors;
-    std::vector<int> allColors;
-    long numberOfNodes;
-    long numberOfEdges;
+    std::vector<int> allColors_;
+    long numberOfNodes_;
+    long numberOfEdges_;
     Node* nodes_;
-    Edge* edges_;
+    SAT* sat_;
 
     const static int N_LEFT_LEFT_INDEX = 0;
     const static int N_LEFT_INDEX = 1;
@@ -29,6 +28,8 @@ public:
 
     void create_nodes();
     void connect_nodes();
+    void construct();
+    bool solveSAT();
     void analyzeStructure();
 
 private:
