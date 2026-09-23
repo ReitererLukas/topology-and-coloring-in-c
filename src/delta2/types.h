@@ -38,7 +38,7 @@ struct Node {
     void reverse();
     Node shiftLeft(uchar color) const;
     Node shiftRight(uchar color) const;
-    long getId() const;
+    int getId(int inputColors) const;
 
 };
 

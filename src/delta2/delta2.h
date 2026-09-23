@@ -14,8 +14,8 @@ private:
     std::vector<int> allColors;
     long numberOfNodes;
     long numberOfEdges;
-    Node* nodes;
-    Edge* edges;
+    Node* nodes_;
+    Edge* edges_;
 
     const static int N_LEFT_LEFT_INDEX = 0;
     const static int N_LEFT_INDEX = 1;
@@ -29,6 +29,7 @@ public:
 
     void create_nodes();
     void connect_nodes();
+    void analyzeStructure();
 
 private:
     void canonicalizeNode(Node& node);

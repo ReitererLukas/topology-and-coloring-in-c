@@ -1,5 +1,9 @@
 CXX = g++
-CPPFLAGS = -Isrc
+CADICAL_DIR = ../cadical
+CADICAL_BUILD_DIR = $(CADICAL_DIR)/build
+CADICAL_LIB = $(CADICAL_BUILD_DIR)/libcadical.a
+CPPFLAGS = -Isrc -I$(CADICAL_DIR)/src
+LDLIBS = -L$(CADICAL_BUILD_DIR) -lcadical
 CXXFLAGS = -Wall -Wextra -Wpedantic -Wshadow -Wconversion \
            -Woverloaded-virtual -Wnon-virtual-dtor -Wdelete-non-virtual-dtor \
            -Wformat=2 -Winit-self -Wunused-variable -Wunused-function \
@@ -26,6 +30,16 @@ TEST_OBJECTS += $(OBJDIR)/test_runner_main.o
 
 all: $(TARGET)
 
+$(CADICAL_LIB):
+	@if [ ! -f "$(CADICAL_DIR)/configure" ]; then \
+		echo "CaDiCaL checkout not found at $(CADICAL_DIR)"; \
+		exit 1; \
+	fi
+	@if [ ! -f "$(CADICAL_BUILD_DIR)/makefile" ]; then \
+		cd "$(CADICAL_DIR)" && ./configure; \
+	fi
+	$(MAKE) -C "$(CADICAL_DIR)" cadical
+
 $(OBJDIR):
 	mkdir -p $(OBJDIR)
 
@@ -33,8 +47,8 @@ $(OBJDIR)/%.o: $(SRCDIR)/%.cpp | $(OBJDIR)
 	@mkdir -p $(dir $@)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $< -o $@
 
-$(TARGET): $(OBJECTS)
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(OBJECTS) -o $(TARGET)
+$(TARGET): $(OBJECTS) $(CADICAL_LIB)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(OBJECTS) $(LDLIBS) -o $(TARGET)
 
 run: $(TARGET)
 	./$(TARGET) $(filter-out $@,$(MAKECMDGOALS))
@@ -42,8 +56,8 @@ run: $(TARGET)
 test: $(TESTBIN)
 	./$(TESTBIN)
 
-$(TESTBIN): $(TEST_OBJECTS)
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(TEST_OBJECTS) -o $(TESTBIN)
+$(TESTBIN): $(TEST_OBJECTS) $(CADICAL_LIB)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(TEST_OBJECTS) $(LDLIBS) -o $(TESTBIN)
 
 $(OBJDIR)/test_runner_main.o: $(TESTDIR)/test_runner.cpp | $(OBJDIR)
 	@mkdir -p $(dir $@)

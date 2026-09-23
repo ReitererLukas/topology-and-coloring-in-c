@@ -1,5 +1,9 @@
 #include "types.h"
 
+#include <algorithm>
+#include <cassert>
+#include <cstdint>
+
 Node Node::getReversedNode() const {
     return Node(right_right_, right_, center_, left_, left_left_);
 }
@@ -23,11 +27,45 @@ Node Node::shiftRight(uchar color) const {
 }
 
 // id is unique for every Node
-long Node::getId() const {
-    long id = (left_left_ + 1) * 100;
-    id = (id + left_) * 100;
-    id = (id + center_) * 100;
-    id = (id + right_) * 100;
-    id = (id + right_right_) * 100;
-    return id;
+int Node::getId(int inputColors) const {
+    assert(inputColors >= 2);
+
+    assert(left_left_ < inputColors);
+    assert(left_ < inputColors);
+    assert(center_ < inputColors);
+    assert(right_ < inputColors);
+    assert(right_right_ < inputColors);
+
+    assert(left_left_ != left_);
+    assert(left_ != center_);
+    assert(center_ != right_);
+    assert(right_ != right_right_);
+
+    const int side = inputColors - 1;
+    const int numberOfArms = side * side;
+    const int nodesPerCenter =
+        numberOfArms * (numberOfArms + 1) / 2;
+
+    auto removeExcludedValue = [](unsigned value, unsigned excluded) {
+        assert(value != excluded);
+        return value - (value > excluded ? 1 : 0);
+    };
+
+    auto armRank = [&](unsigned near, unsigned outer) {
+        const int nearRank = removeExcludedValue(near, center_);
+        const int outerRank = removeExcludedValue(outer, near);
+
+        return nearRank * side + outerRank;
+    };
+
+    const std::uint64_t leftArm = armRank(left_, left_left_);
+    const std::uint64_t rightArm = armRank(right_, right_right_);
+
+    const std::uint64_t lower = std::min(leftArm, rightArm);
+    const std::uint64_t upper = std::max(leftArm, rightArm);
+
+    // Perfect rank for an unordered pair with repetition.
+    const int pairRank = upper * (upper + 1) / 2 + lower;
+
+    return ((int) center_) * nodesPerCenter + pairRank + 1;
 }

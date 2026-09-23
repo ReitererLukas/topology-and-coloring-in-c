@@ -5,10 +5,11 @@
 void delta2() {
     Delta2GraphCreator gc = Delta2GraphCreator(10, 3);
     gc.create_nodes();
-    gc.connect_nodes();
+    // gc.connect_nodes();
+    gc.analyzeStructure();
 
-    int x;
-    std::cin >> x;
+    // int x;
+    // std::cin >> x;
 
 }
 

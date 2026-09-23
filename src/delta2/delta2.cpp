@@ -2,6 +2,7 @@
 #include <cassert>
 #include <cmath>
 #include <iostream>
+#include <bits/stdc++.h>
 
 // mmap
 #include <sys/mman.h>
@@ -40,16 +41,16 @@ Delta2GraphCreator::Delta2GraphCreator(int input_colors, int output_colors) {
         std::cerr << "Error for edges file" << std::endl;
     }
     
-    nodes = (Node*) mmap(NULL, sizeof(Node) * numberOfNodes, PROT_WRITE | PROT_READ, MAP_SHARED, fdNodes, 0);
-    edges = (Edge*) mmap(NULL, sizeof(Edge) * numberOfEdges, PROT_WRITE | PROT_READ, MAP_SHARED, fdEdges, 0);
+    nodes_ = (Node*) mmap(NULL, sizeof(Node) * numberOfNodes, PROT_WRITE | PROT_READ, MAP_SHARED, fdNodes, 0);
+    edges_ = (Edge*) mmap(NULL, sizeof(Edge) * numberOfEdges, PROT_WRITE | PROT_READ, MAP_SHARED, fdEdges, 0);
     close(fdNodes);
     close(fdEdges);
 }
 
 Delta2GraphCreator::~Delta2GraphCreator() {
     std::cout << "Destroy everything" << std::endl;
-    munmap(nodes, sizeof(Node) * numberOfNodes);
-    munmap(edges, sizeof(Edge) * numberOfEdges);
+    munmap(nodes_, sizeof(Node) * numberOfNodes);
+    munmap(edges_, sizeof(Edge) * numberOfEdges);
 }
 
 void Delta2GraphCreator::create_nodes() {
@@ -68,7 +69,7 @@ void Delta2GraphCreator::create_nodes() {
                         if(n_right_right == n_right) continue;
                         if(n_left == n_right && *n_right_right < *n_left_left) continue;
                         
-                        new (nodes + index) Node((uchar)*n_left_left, (uchar)*n_left, (uchar)*center, (uchar)*n_right, (uchar)*n_right_right);
+                        new (nodes_ + index) Node((uchar)*n_left_left, (uchar)*n_left, (uchar)*center, (uchar)*n_right, (uchar)*n_right_right);
                         index++;
                     }
                 }
@@ -112,16 +113,48 @@ void Delta2GraphCreator::connect_nodes() {
     
     long index = 0;
     for(long i = 0; i < numberOfNodes; i++) {
-        Node originalNode = nodes[i];
+        Node originalNode = nodes_[i];
         findNeighborsOfSingleNode(&originalNode, neighorNodes);
         
         for(auto neiNode = neighorNodes.begin(); neiNode != neighorNodes.end(); neiNode++) {
             if(originalNode < *neiNode) {
-                new (edges + index) Edge(originalNode, *neiNode);
+                new (edges_ + index) Edge(originalNode, *neiNode);
                 index++;
             }
         }
         neighorNodes.clear();
     }
     std::cout << "Finished creating " << index << " edges!" << std::endl;
+}
+
+void Delta2GraphCreator::analyzeStructure() {
+    long counterArrCenter[inputColors_];
+    long counterArr1Hop[inputColors_ * inputColors_];
+    std::memset(counterArrCenter, 0, sizeof(long) * inputColors_);
+    std::memset(counterArr1Hop, 0, sizeof(long) * inputColors_* inputColors_);
+
+
+    for(int i = 0; i < numberOfNodes; i++) {
+        counterArrCenter[nodes_[i].center_]++;
+        counterArr1Hop[nodes_[i].center_ * inputColors_ + nodes_[i].right_]++;
+    }
+    
+    for(int c = 0; c < inputColors_; c++) {
+        std::cout << c << ": " << counterArrCenter[c] << std::endl;
+        // for(int l = 0; l < inputColors_; l++) {
+            
+        //     std::cout << "  " << l << ": " << counterArr1Hop[c*inputColors_ + l] << std::endl;
+        // }
+    }
+    
+    
+    std::set<int> idSet;
+    for(int i = 0; i < numberOfNodes; i++) {
+        idSet.insert(nodes_[i].getId(inputColors_));
+    }
+
+    std::cout << idSet.size() << std::endl;
+    std::cout << numberOfNodes << std::endl;
+
+
 }
