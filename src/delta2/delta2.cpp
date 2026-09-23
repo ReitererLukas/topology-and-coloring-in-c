@@ -11,6 +11,7 @@
 
 Delta2GraphCreator::Delta2GraphCreator(int input_colors, int output_colors) {
     assert(input_colors > output_colors);
+    assert(input_colors < 100 && "Maximum number of 100 input colors");
     inputColors_ = input_colors;
     outputColors_ = output_colors;
 

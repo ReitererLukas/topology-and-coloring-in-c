@@ -34,10 +34,11 @@ struct Node {
         return lhs.left_left_ < rhs.left_left_;
     }
 
-    Node getReversedNode();
+    Node getReversedNode() const;
     void reverse();
-    Node shiftLeft(uchar color);
-    Node shiftRight(uchar color);
+    Node shiftLeft(uchar color) const;
+    Node shiftRight(uchar color) const;
+    long getId() const;
 
 };
 
