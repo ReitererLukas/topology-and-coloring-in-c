@@ -49,4 +49,11 @@ struct Edge {
     Edge(Node node1, Node node2) : node1_{node1}, node2_{node2} {};
 };
 
+struct ParamContainer {
+    void* classObject_;
+    int center_;
+
+    ParamContainer(void* classObject, int center) : classObject_{classObject}, center_{center} {};
+};
+
 #endif

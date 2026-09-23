@@ -7,6 +7,7 @@
 #include <cassert>
 #include <set>
 #include <limits>
+#include <mutex>
 
 class SAT {
 private:
@@ -15,6 +16,7 @@ private:
     CaDiCaL::Solver solver_;
     int inputColors_;
     int outputColors_;
+    std::mutex mutex_;
 
     
 public:
@@ -25,7 +27,7 @@ public:
 
     ~SAT() = default;
 
-    void addNode(Node* node);
+    void addNode(Node& node);
     void addEdge(Node& node1, std::set<Node>::iterator& node2);
     bool solve();
 };

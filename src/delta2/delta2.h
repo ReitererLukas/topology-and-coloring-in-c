@@ -13,7 +13,7 @@ private:
     std::vector<int> allColors_;
     long numberOfNodes_;
     long numberOfEdges_;
-    Node* nodes_;
+    // Node* nodes_;
     SAT* sat_;
 
     const static int N_LEFT_LEFT_INDEX = 0;
@@ -27,15 +27,16 @@ public:
     ~Delta2GraphCreator();
 
     void create_nodes();
-    void connect_nodes();
-    void construct();
     bool solveSAT();
     void analyzeStructure();
-
+    
 private:
-    void canonicalizeNode(Node& node);
-    void findNeighborsOfSingleOrientedNode(Node* node, std::set<Node>& neighborNodes);
-    void findNeighborsOfSingleNode(Node* node, std::set<Node>& neighborNodes);
+    static long create_nodes_parallel_helper(void* params);
+    long connect_node(Node& originalNode) const;
+    long create_nodes_parallel(int center) const;
+    void canonicalizeNode(Node& node) const;
+    void findNeighborsOfSingleOrientedNode(Node& node, std::set<Node>& neighborNodes) const;
+    void findNeighborsOfSingleNode(Node& node, std::set<Node>& neighborNodes) const;
 
 };
 
