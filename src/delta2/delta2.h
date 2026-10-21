@@ -23,7 +23,7 @@ private:
     const static int N_RIGHT_RIGHT_INDEX = 4;
 
 public:
-    Delta2GraphCreator(int input_colors, int output_colors);
+    Delta2GraphCreator(int input_colors);
     ~Delta2GraphCreator();
 
     void create_nodes();

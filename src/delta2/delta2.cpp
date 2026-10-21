@@ -10,11 +10,11 @@
 #include <fcntl.h>
 #include <unistd.h>
 
-Delta2GraphCreator::Delta2GraphCreator(int input_colors, int output_colors) {
-    assert(input_colors > output_colors);
+Delta2GraphCreator::Delta2GraphCreator(int input_colors) {
+    assert(input_colors > 3);
     assert(input_colors < 100 && "Maximum number of 100 input colors");
     inputColors_ = input_colors;
-    outputColors_ = output_colors;
+    outputColors_ = 3;
 
     for(int i = 0; i < input_colors; i++) {
         this->allColors_.push_back(i);
