@@ -16,10 +16,7 @@ void delta2(int input_colors) {
 void delta2loop(int upper_bound) {
 
     for(int input_colors = 4; input_colors < upper_bound; input_colors++) {
-        std::cout << std::endl << std::endl << "===================" << std::endl << "Starting colors: " << input_colors << std::endl;
-        Delta2GraphCreator gc = Delta2GraphCreator(input_colors);
-        gc.construct();
-        gc.solveSAT();
+       delta2(input_colors);
     }
 }
 
