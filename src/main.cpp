@@ -3,6 +3,7 @@
 #include <chrono>
 
 void delta2(int input_colors) {
+    std::cout << std::endl << std::endl << "===================" << std::endl << "Starting colors: " << input_colors << std::endl;
     auto start = std::chrono::high_resolution_clock::now();
     
     Delta2GraphCreator gc = Delta2GraphCreator(input_colors);
